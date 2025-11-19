@@ -34,7 +34,7 @@ export default function DrumsToolPage() {
   const canUseResult = !!result && !pending;
 
   return (
-    <Card className="shadow-floating">
+    <Card className="glassy shine-border shadow-floating">
       <CardHeader>
         <CardTitle>AI Drum Pattern</CardTitle>
         <CardDescription>ریتم ضربی چهارلاینی با کیک، اسنیر و های‌هت.</CardDescription>

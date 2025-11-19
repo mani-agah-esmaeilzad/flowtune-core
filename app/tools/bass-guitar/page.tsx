@@ -40,7 +40,7 @@ export default function BassGuitarToolPage() {
   const canUseResult = !!result && !pending;
 
   return (
-    <Card className="shadow-floating">
+    <Card className="glassy shine-border shadow-floating">
       <CardHeader>
         <CardTitle>AI Bassline & Guitar Rhythm</CardTitle>
         <CardDescription>لاین بیس و ریتم گیتار هماهنگ با کلید و تمپو انتخابی.</CardDescription>

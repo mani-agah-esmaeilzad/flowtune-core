@@ -35,7 +35,7 @@ export default function ChordsToolPage() {
   const canUseResult = !!result && !pending;
 
   return (
-    <Card className="shadow-floating">
+    <Card className="glassy shine-border shadow-floating">
       <CardHeader>
         <CardTitle>AI Chord Suggestion</CardTitle>
         <CardDescription>گام و سبک را انتخاب کنید تا FlowTune یک progression کامل بسازد.</CardDescription>

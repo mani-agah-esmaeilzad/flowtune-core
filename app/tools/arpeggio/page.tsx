@@ -35,7 +35,7 @@ export default function ArpeggioToolPage() {
   const canUseResult = !!result && !pending;
 
   return (
-    <Card className="shadow-floating">
+    <Card className="glassy shine-border shadow-floating">
       <CardHeader>
         <CardTitle>AI Arpeggio Maker</CardTitle>
         <CardDescription>یک آکورد بدهید تا الگوی آرپژ مناسب سبک انتخابی ساخته شود.</CardDescription>

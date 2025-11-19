@@ -35,7 +35,7 @@ export default function MelodyToolPage() {
   const canUseResult = !!result && !pending;
 
   return (
-    <Card className="shadow-floating">
+    <Card className="glassy shine-border shadow-floating">
       <CardHeader>
         <CardTitle>AI Melody Generator</CardTitle>
         <CardDescription>گام و حس را مشخص کنید تا یک ملودی تراز Tone.js بگیرید.</CardDescription>
