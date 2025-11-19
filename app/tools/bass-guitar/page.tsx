@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { generateBassGuitar } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
-import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadMidiFile, downloadPatternMp3 } from "@/lib/music/exporters";
 import type { BassGuitarResponse } from "@/lib/types/music";
 import { savePattern } from "@/lib/music/layerStore";
 
 const keyOptions = ["C", "G", "D", "A", "E", "F", "Bb", "Eb"];
-const styles = ["Funk", "Disco", "Indie", "Pop", "Reggae", "Synthwave"];
+const styles = ["Funk", "Disco", "Indie", "Pop", "Reggae", "Synthwave", "Heavy Metal"];
 
 export default function BassGuitarToolPage() {
   const [input, setInput] = useState({ key: "C", tempo: 110, style: "Indie", bars: 2 });
@@ -133,6 +133,14 @@ export default function BassGuitarToolPage() {
             onClick={() => result && downloadMidiFile("bass-guitar", result, "bass-guitar.mid")}
           >
             دانلود MIDI
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canUseResult}
+            onClick={() => result && downloadPatternMp3("bass-guitar", result, "bass-guitar.mp3")}
+          >
+            دانلود MP3
           </Button>
         </div>
 

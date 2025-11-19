@@ -16,7 +16,7 @@ import {
   generateGuitarFromDrums,
   generateMelody,
 } from "../actions";
-import { downloadJsonFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadLayerStackMp3, downloadPatternMp3 } from "@/lib/music/exporters";
 import { playLayerStack, playPattern } from "@/lib/music/tonePlayer";
 import type {
   ArpeggioResponse,
@@ -29,7 +29,7 @@ import type {
   MelodyResponse,
 } from "@/lib/types/music";
 
-const styles = ["Cinematic", "Indie", "Funk", "Trap", "Rock", "Jazz", "House"];
+const styles = ["Cinematic", "Indie", "Funk", "Trap", "Rock", "Jazz", "House", "Heavy Metal"];
 const moods = ["happy", "moody", "epic", "uplifting", "dark"];
 const grooves = ["syncopated", "laid-back", "driving", "swing", "staccato"];
 const arpSpeeds = ["calm", "standard", "fast", "sparkling"];
@@ -172,6 +172,13 @@ export default function UnifiedStudioPage() {
               </Button>
               <Button variant="outline" onClick={() => drums && downloadJsonFile(drums, "drums.json")} disabled={!drums}>
                 دانلود JSON
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => drums && downloadPatternMp3("drums", drums, "drums.mp3")}
+                disabled={!drums}
+              >
+                دانلود MP3
               </Button>
             </div>
             <Textarea value={drums ? JSON.stringify(drums, null, 2) : ""} readOnly rows={10} className="font-mono text-xs" />
@@ -321,6 +328,27 @@ export default function UnifiedStudioPage() {
               <Button variant="secondary" onClick={() => arpeggio && playPattern(arpeggio)} disabled={!arpeggio}>
                 پلی آرپژ
               </Button>
+              <Button
+                variant="outline"
+                onClick={() => chords && downloadPatternMp3("chords", chords, "chords.mp3")}
+                disabled={!chords}
+              >
+                MP3 آکورد
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => melody && downloadPatternMp3("melody", melody, "melody.mp3")}
+                disabled={!melody}
+              >
+                MP3 ملودی
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => arpeggio && downloadPatternMp3("arpeggio", arpeggio, "arpeggio.mp3")}
+                disabled={!arpeggio}
+              >
+                MP3 آرپژ
+              </Button>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <Textarea
@@ -450,6 +478,13 @@ export default function UnifiedStudioPage() {
               >
                 دانلود JSON
               </Button>
+              <Button
+                variant="outline"
+                onClick={() => bassGuitar && downloadPatternMp3("bass-guitar", bassGuitar, "bass-guitar.mp3")}
+                disabled={!bassGuitar}
+              >
+                دانلود MP3
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -559,6 +594,22 @@ export default function UnifiedStudioPage() {
               <Button variant="secondary" onClick={() => bassOverlay && playPattern(bassOverlay)} disabled={!bassOverlay}>
                 پلی بیس
               </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  guitarOverlay && downloadPatternMp3("guitar-from-drums", guitarOverlay, "guitar-overlay.mp3")
+                }
+                disabled={!guitarOverlay}
+              >
+                MP3 گیتار
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => bassOverlay && downloadPatternMp3("bass-from-groove", bassOverlay, "bass-overlay.mp3")}
+                disabled={!bassOverlay}
+              >
+                MP3 بیس
+              </Button>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <Textarea
@@ -601,6 +652,9 @@ export default function UnifiedStudioPage() {
               پلی همه لایه‌ها
             </Button>
             <Button variant="outline" onClick={() => downloadJsonFile(combinedJson, "flowtune-stack.json")}>دانلود JSON</Button>
+            <Button variant="outline" onClick={() => downloadLayerStackMp3(stackPayload, "flowtune-stack.mp3")}>
+              دانلود MP3 کل
+            </Button>
             <Button
               variant="secondary"
               onClick={() => {

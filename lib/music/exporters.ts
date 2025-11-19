@@ -1,8 +1,10 @@
 "use client";
 
+import lamejs from "lamejs";
 import { Midi } from "@tonejs/midi";
+import { renderLayerAudio, renderPatternAudio } from "./tonePlayer";
 import { beatsFromTransport, beatsToSeconds, durationBeats, getChordNotes } from "./utils";
-import type { ToolResponseMap, ToolType, TimedNote } from "@/lib/types/music";
+import type { LayerStackPayload, ToolResponseMap, ToolType, TimedNote } from "@/lib/types/music";
 
 export function downloadJsonFile(filename: string, data: unknown) {
   if (!data) return;
@@ -53,6 +55,28 @@ export function downloadMidiFile<T extends ToolType>(
   const bytes = midi.toArray();
   const blob = new Blob([bytes], { type: "audio/midi" });
   triggerDownload(blob, filename.endsWith(".mid") ? filename : `${filename}.mid`);
+}
+
+export async function downloadPatternMp3<T extends ToolType>(
+  type: T,
+  payload: ToolResponseMap[T],
+  filename: string
+) {
+  if (!payload) return;
+  const buffer = await renderPatternAudio(type, payload);
+  if (!buffer) return;
+  const blob = audioBufferToMp3Blob(buffer);
+  triggerDownload(blob, filename.endsWith(".mp3") ? filename : `${filename}.mp3`);
+}
+
+export async function downloadLayerStackMp3(
+  layers: LayerStackPayload,
+  filename = "flowtune-stack.mp3"
+) {
+  const buffer = await renderLayerAudio(layers);
+  if (!buffer) return;
+  const blob = audioBufferToMp3Blob(buffer);
+  triggerDownload(blob, filename.endsWith(".mp3") ? filename : `${filename}.mp3`);
 }
 
 function triggerDownload(blob: Blob, filename: string) {
@@ -141,4 +165,38 @@ function noteToMidi(note: string) {
   const octave = parseInt(octaveStr, 10);
   const offset = semitones[normalized] ?? 0;
   return 12 * (octave + 1) + offset;
+}
+
+function audioBufferToMp3Blob(buffer: AudioBuffer) {
+  const sampleRate = buffer.sampleRate;
+  const left = buffer.getChannelData(0);
+  const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : left;
+  const mp3encoder = new lamejs.Mp3Encoder(2, sampleRate, 192);
+  const blockSize = 1152;
+  const mp3Data: Int8Array[] = [];
+
+  for (let i = 0; i < left.length; i += blockSize) {
+    const leftChunk = floatTo16BitPCM(left.subarray(i, i + blockSize));
+    const rightChunk = floatTo16BitPCM(right.subarray(i, i + blockSize));
+    const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+    if (mp3buf.length > 0) {
+      mp3Data.push(new Int8Array(mp3buf));
+    }
+  }
+
+  const end = mp3encoder.flush();
+  if (end.length > 0) {
+    mp3Data.push(new Int8Array(end));
+  }
+
+  return new Blob(mp3Data, { type: "audio/mpeg" });
+}
+
+function floatTo16BitPCM(input: Float32Array) {
+  const output = new Int16Array(input.length);
+  for (let i = 0; i < input.length; i++) {
+    const s = Math.max(-1, Math.min(1, input[i]));
+    output[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return output;
 }

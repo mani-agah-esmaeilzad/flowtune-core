@@ -9,11 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { generateDrumPattern } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
-import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadMidiFile, downloadPatternMp3 } from "@/lib/music/exporters";
 import type { DrumPatternResponse } from "@/lib/types/music";
 import { savePattern } from "@/lib/music/layerStore";
 
-const styles = ["House", "Hip-Hop", "Trap", "Funk", "Afrobeat", "DnB"];
+const styles = ["House", "Hip-Hop", "Trap", "Funk", "Afrobeat", "DnB", "Heavy Metal"];
 
 export default function DrumsToolPage() {
   const [input, setInput] = useState({ style: "House", bars: 2 });
@@ -103,6 +103,14 @@ export default function DrumsToolPage() {
             onClick={() => result && downloadMidiFile("drums", result, "drums.mid")}
           >
             دانلود MIDI
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canUseResult}
+            onClick={() => result && downloadPatternMp3("drums", result, "drums.mp3")}
+          >
+            دانلود MP3
           </Button>
         </div>
 

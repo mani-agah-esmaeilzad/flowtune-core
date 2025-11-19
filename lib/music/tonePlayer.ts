@@ -1,7 +1,7 @@
 "use client";
 
 import * as Tone from "tone";
-import { getChordNotes } from "./utils";
+import { beatsFromTransport, beatsToSeconds, durationBeats, getChordNotes } from "./utils";
 import type {
   ArpeggioResponse,
   BassGuitarResponse,
@@ -28,6 +28,34 @@ async function prepareTransport(tempo = 110) {
   Tone.Transport.cancel();
   Tone.Transport.position = 0;
   Tone.Transport.bpm.value = tempo;
+}
+
+function schedulePattern(type: ToolType, data: any) {
+  switch (type) {
+    case "chords":
+      scheduleChords(data as ChordSuggestionResponse);
+      break;
+    case "melody":
+      scheduleMelody(data as MelodyResponse, "triangle");
+      break;
+    case "drums":
+      scheduleDrums(data as DrumPatternResponse);
+      break;
+    case "arpeggio":
+      scheduleMelody(data as ArpeggioResponse, "sine");
+      break;
+    case "bass-guitar":
+      scheduleBassGuitar(data as BassGuitarResponse);
+      break;
+    case "guitar-from-drums":
+      scheduleGuitarOverlay(data as GuitarFromDrumsResponse);
+      break;
+    case "bass-from-groove":
+      scheduleBassOverlay(data as BassFromGrooveResponse);
+      break;
+    default:
+      break;
+  }
 }
 
 function humanizeTime(time: string | number | undefined, range = 0.012) {
@@ -93,6 +121,43 @@ export async function playLayerStack(layers: LayerStackPayload) {
   if (layers.bassOverlay) scheduleBassOverlay(layers.bassOverlay);
 
   Tone.Transport.start();
+}
+
+export async function renderPatternAudio(type: ToolType, data: unknown) {
+  if (!data) return null;
+  const tempo = (data as { tempo?: number }).tempo ?? 110;
+  const duration = estimatePatternDuration(type, data as any, tempo);
+  return Tone.Offline(() => {
+    Tone.Transport.cancel();
+    Tone.Transport.position = 0;
+    Tone.Transport.bpm.value = tempo;
+    schedulePattern(type, data as any);
+    Tone.Transport.start(0);
+  }, duration + 1);
+}
+
+export async function renderLayerAudio(layers: LayerStackPayload) {
+  const tempo =
+    layers.tempo ||
+    layers.bassGuitar?.tempo ||
+    layers.guitarOverlay?.tempo ||
+    layers.drums?.tempo ||
+    layers.melody?.tempo ||
+    110;
+  const duration = estimateLayerDuration(layers, tempo);
+  return Tone.Offline(() => {
+    Tone.Transport.cancel();
+    Tone.Transport.position = 0;
+    Tone.Transport.bpm.value = tempo;
+    if (layers.chords) scheduleChords(layers.chords);
+    if (layers.melody) scheduleMelody(layers.melody, "triangle");
+    if (layers.arpeggio) scheduleMelody(layers.arpeggio, "sine");
+    if (layers.drums) scheduleDrums(layers.drums);
+    if (layers.bassGuitar) scheduleBassGuitar(layers.bassGuitar);
+    if (layers.guitarOverlay) scheduleGuitarOverlay(layers.guitarOverlay);
+    if (layers.bassOverlay) scheduleBassOverlay(layers.bassOverlay);
+    Tone.Transport.start(0);
+  }, duration + 1);
 }
 
 function scheduleChords(result: ChordSuggestionResponse) {
@@ -198,4 +263,62 @@ function scheduleBassOverlay(result: BassFromGrooveResponse) {
       bass.triggerAttackRelease(note.note, duration, scheduleTime, velocity);
     }, humanizeTime(note.time, 0.018));
   });
+}
+
+function estimatePatternDuration(type: ToolType, data: any, tempo: number) {
+  const beatToSeconds = (beats: number) => beatsToSeconds(beats, tempo);
+  switch (type) {
+    case "chords": {
+      const totalBeats = (data.progression || []).reduce(
+        (sum: number, _chord: string, index: number) => sum + durationBeats(data.timing?.[index] || "1m"),
+        0
+      );
+      return beatToSeconds(totalBeats);
+    }
+    case "melody":
+    case "arpeggio":
+      return beatToSeconds(maxNoteEndBeat(data.notes));
+    case "drums":
+      return beatToSeconds(maxBeatFromGrid([data.kick, data.snare, data.hihat]));
+    case "bass-guitar":
+      return beatToSeconds(Math.max(maxNoteEndBeat(data.bass), maxNoteEndBeat(data.guitar)));
+    case "guitar-from-drums":
+      return beatToSeconds(maxNoteEndBeat(data.guitar));
+    case "bass-from-groove":
+      return beatToSeconds(maxNoteEndBeat(data.bass));
+    default:
+      return beatToSeconds(8);
+  }
+}
+
+function estimateLayerDuration(layers: LayerStackPayload, tempo: number) {
+  const ends: number[] = [];
+  if (layers.chords) ends.push(estimatePatternDuration("chords", layers.chords, tempo));
+  if (layers.melody) ends.push(estimatePatternDuration("melody", layers.melody, tempo));
+  if (layers.arpeggio) ends.push(estimatePatternDuration("arpeggio", layers.arpeggio, tempo));
+  if (layers.drums) ends.push(estimatePatternDuration("drums", layers.drums, tempo));
+  if (layers.bassGuitar) ends.push(estimatePatternDuration("bass-guitar", layers.bassGuitar, tempo));
+  if (layers.guitarOverlay) ends.push(estimatePatternDuration("guitar-from-drums", layers.guitarOverlay, tempo));
+  if (layers.bassOverlay) ends.push(estimatePatternDuration("bass-from-groove", layers.bassOverlay, tempo));
+  return Math.max(10, ...ends.filter(Boolean));
+}
+
+function maxBeatFromGrid(grids: (string[] | undefined)[]) {
+  let maxBeat = 0;
+  grids
+    .filter(Boolean)
+    .forEach((grid) => {
+      grid?.forEach((time) => {
+        maxBeat = Math.max(maxBeat, beatsFromTransport(time) + 1);
+      });
+    });
+  return maxBeat || 8;
+}
+
+function maxNoteEndBeat(notes: { time: string | number; duration: string | number }[] = []) {
+  return notes.reduce((max, note) => {
+    const start = beatsFromTransport(note.time || 0);
+    const len = durationBeats(note.duration || "8n");
+    return Math.max(max, start + len);
+  }, 0);
 }

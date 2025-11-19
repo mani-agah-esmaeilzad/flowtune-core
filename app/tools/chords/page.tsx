@@ -9,12 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { generateChordSuggestion } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
-import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadMidiFile, downloadPatternMp3 } from "@/lib/music/exporters";
 import type { ChordSuggestionResponse } from "@/lib/types/music";
 import { savePattern } from "@/lib/music/layerStore";
 
 const keyOptions = ["C", "G", "D", "A", "E", "B", "F", "Bb", "Eb", "Ab"];
-const styleOptions = ["Pop", "Rock", "Jazz", "R&B", "Lo-Fi", "Electronic"];
+const styleOptions = ["Pop", "Rock", "Jazz", "R&B", "Lo-Fi", "Electronic", "Heavy Metal"];
 
 export default function ChordsToolPage() {
   const [input, setInput] = useState({ key: "C", style: "Pop", bars: 4 });
@@ -122,6 +122,14 @@ export default function ChordsToolPage() {
             onClick={() => result && downloadMidiFile("chords", result, "chords.mid")}
           >
             دانلود MIDI
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canUseResult}
+            onClick={() => result && downloadPatternMp3("chords", result, "chords.mp3")}
+          >
+            دانلود MP3
           </Button>
         </div>
 

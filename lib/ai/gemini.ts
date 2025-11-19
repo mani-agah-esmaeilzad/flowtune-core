@@ -76,14 +76,14 @@ Rules:
 - Return pure JSON matching {"progression":[],"timing":[],"tempo":number}
 - Use ${Number(bars) * 2} to ${Number(bars) * 3} chords including tasteful secondary dominants, borrowed chords, and inversions.
 - timing array must match progression length and add up to exactly ${bars} measures using Tone.js durations (1m, 2n, 4n, 8n).
-- Tempo is a bpm integer between 88-132 aligned to the style.
+- Tempo is a bpm integer between 88-132 aligned to the style. If style mentions metal, lean into darker minor modes, tritone motion, and cadential power-chord moments.
 `,
   melody: ({ key, mood, bars = 4 }) => `Compose a memorable ${bars}-bar melody in key ${key} that feels ${mood}. Output JSON exactly like {"notes": [{"note":"E4","duration":"8n","time":0}],"tempo":number}. Each time may be number or Tone.js transport string.
 Guidance:
 - Keep phrases within 2 octaves, allow pickups and held notes.
 - Include repetition and variation across the bars, with durations of 4n/8n/16n and occasional 2n for sustain.
 - Provide at least ${Number(bars) * 4} notes and embed gentle velocity values (0.65-0.95).`,
-  drums: ({ style, bars = 2 }) => `Design a ${bars}-bar drum groove for style ${style}. Respond with {"kick":[],"snare":[],"hihat":[],"tempo":number}. Use Tone.js transport times (e.g. "0:0", "0:1", "1:2.5") covering ${bars} bars (from 0:0 up to ${bars - 1}:3). Layer ghost hits and syncopation by adding sixteenth offsets like 0:2.5.`,
+  drums: ({ style, bars = 2 }) => `Design a ${bars}-bar drum groove for style ${style}. Respond with {"kick":[],"snare":[],"hihat":[],"tempo":number}. Use Tone.js transport times (e.g. "0:0", "0:1", "1:2.5") covering ${bars} bars (from 0:0 up to ${bars - 1}:3). Layer ghost hits and syncopation by adding sixteenth offsets like 0:2.5. If the style is metal or heavy metal, add double-kick bursts, halftime breakdown backbeats, and bright ride/crash markers on section starts.`,
   arpeggio: ({ chord, speed, bars = 2 }) => `Generate an evolving ${bars}-bar arpeggio for chord ${chord} with feel ${speed}. Respond as JSON {"notes": [...],"tempo":number}. Each note requires note/duration/time. Keep motion flowing in eighths or sixteenths, include passing tones, and span up to two octaves with occasional velocity nuances.`,
   "bass-guitar": ({ key, tempo, style, bars = 2 }) => `Build a ${bars}-bar bass line and complementary guitar rhythm for key ${key} in style ${style} at tempo ${tempo} bpm. Return JSON {"bass":[{note,duration,time,velocity?}],"guitar":[{note,duration,time,velocity?}],"tempo":${tempo}}.
 Guidance:

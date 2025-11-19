@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { generateBassFromGroove, generateGuitarFromDrums } from "../actions";
 import { playLayerStack, playPattern } from "@/lib/music/tonePlayer";
-import { downloadJsonFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadLayerStackMp3, downloadPatternMp3 } from "@/lib/music/exporters";
 import { loadPattern, savePattern } from "@/lib/music/layerStore";
 import type {
   ArpeggioResponse,
@@ -22,7 +22,7 @@ import type {
   MelodyResponse,
 } from "@/lib/types/music";
 
-const grooveStyles = ["Cinematic", "Indie", "Funk", "Trap", "Rock"];
+const grooveStyles = ["Cinematic", "Indie", "Funk", "Trap", "Rock", "Heavy Metal"];
 const grooveFeels = ["syncopated", "laid-back", "driving", "swing", "staccato"];
 const keys = ["C", "D", "E", "F", "G", "A", "B", "Bb", "Eb"];
 
@@ -193,7 +193,7 @@ export default function LayeredGroovePage() {
               onChange={(event) => setDrumInput(event.target.value)}
               className="font-mono text-xs"
               rows={10}
-              placeholder={'{ "kick": [...], "snare": [...], "hihat": [...] }'}
+              placeholder="{ \"kick\": [...], \"snare\": [...], \"hihat\": [...] }"
             />
             <div className="flex flex-wrap gap-3">
               <Button onClick={handleLoadDrums}>بارگذاری JSON درام</Button>
@@ -210,6 +210,13 @@ export default function LayeredGroovePage() {
                 onClick={() => drums && downloadJsonFile("drums.json", drums)}
               >
                 دانلود JSON درام
+              </Button>
+              <Button
+                variant="outline"
+                disabled={!drums}
+                onClick={() => drums && downloadPatternMp3("drums", drums, "drums.mp3")}
+              >
+                دانلود MP3 درام
               </Button>
             </div>
           </CardContent>
@@ -289,6 +296,13 @@ export default function LayeredGroovePage() {
                 onClick={() => guitarLayer && downloadJsonFile("guitar.json", guitarLayer)}
               >
                 دانلود گیتار
+              </Button>
+              <Button
+                variant="outline"
+                disabled={!guitarLayer}
+                onClick={() => guitarLayer && downloadPatternMp3("guitar-from-drums", guitarLayer, "guitar.mp3")}
+              >
+                MP3 گیتار
               </Button>
             </div>
             {guitarLayer && (
@@ -374,6 +388,13 @@ export default function LayeredGroovePage() {
             >
               دانلود بیس
             </Button>
+            <Button
+              variant="outline"
+              disabled={!bassLayer}
+              onClick={() => bassLayer && downloadPatternMp3("bass-from-groove", bassLayer, "bass.mp3")}
+            >
+              MP3 بیس
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -405,6 +426,9 @@ export default function LayeredGroovePage() {
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => downloadJsonFile("flowtune-stack.json", combinedJson)}>
                   دانلود استک
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => downloadLayerStackMp3(stackPayload)}>
+                  MP3 استک
                 </Button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">Tone.js با همان تمپو {tempo} bpm همه لاین‌ها را پلی می‌کند.</p>

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { generateMelody } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
-import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadMidiFile, downloadPatternMp3 } from "@/lib/music/exporters";
 import type { MelodyResponse } from "@/lib/types/music";
 import { savePattern } from "@/lib/music/layerStore";
 
@@ -116,6 +116,14 @@ export default function MelodyToolPage() {
             onClick={() => result && downloadMidiFile("melody", result, "melody.mid")}
           >
             دانلود MIDI
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canUseResult}
+            onClick={() => result && downloadPatternMp3("melody", result, "melody.mp3")}
+          >
+            دانلود MP3
           </Button>
         </div>
 

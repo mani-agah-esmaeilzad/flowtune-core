@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { generateArpeggio } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
-import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
+import { downloadJsonFile, downloadMidiFile, downloadPatternMp3 } from "@/lib/music/exporters";
 import type { ArpeggioResponse } from "@/lib/types/music";
 import { savePattern } from "@/lib/music/layerStore";
 
@@ -111,6 +111,14 @@ export default function ArpeggioToolPage() {
             onClick={() => result && downloadMidiFile("arpeggio", result, "arpeggio.mid")}
           >
             دانلود MIDI
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!canUseResult}
+            onClick={() => result && downloadPatternMp3("arpeggio", result, "arpeggio.mp3")}
+          >
+            دانلود MP3
           </Button>
         </div>
 
