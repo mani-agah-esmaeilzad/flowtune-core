@@ -1,0 +1,45 @@
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --muted: 215 16% 92%;
+  --muted-foreground: 222 15% 46%;
+  --border: 215 25% 90%;
+  --input: 215 25% 90%;
+  --ring: 240 5% 65%;
+  --primary: 248 72% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 199 94% 64%;
+  --secondary-foreground: 222 47% 11%;
+  --accent: 34 100% 50%;
+  --accent-foreground: 222 47% 11%;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --card: 226 28% 15%;
+  --card-foreground: 210 40% 98%;
+  --popover: 226 28% 15%;
+  --popover-foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --border: 217 33% 20%;
+  --input: 217 33% 20%;
+  --ring: 215 20% 65%;
+  --primary: 248 72% 65%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 199 94% 70%;
+  --secondary-foreground: 222 47% 11%;
+  --accent: 34 100% 60%;
+  --accent-foreground: 222 47% 11%;
+}
+
+body {
+  min-height: 100vh;
+  background-image: radial-gradient(circle at top, rgba(99, 102, 241, 0.12), transparent 60%),
+    radial-gradient(circle at bottom, rgba(236, 72, 153, 0.1), transparent 50%);
+}
