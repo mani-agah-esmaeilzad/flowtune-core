@@ -15,7 +15,7 @@ import type { ArpeggioResponse } from "@/lib/types/music";
 const feels = ["Gentle 8th", "Fast 16th", "Swing", "Triplet", "Broken Chords"];
 
 export default function ArpeggioToolPage() {
-  const [input, setInput] = useState({ chord: "Cmaj7", speed: "Gentle 8th" });
+  const [input, setInput] = useState({ chord: "Cmaj7", speed: "Gentle 8th", bars: 2 });
   const [result, setResult] = useState<ArpeggioResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -41,7 +41,7 @@ export default function ArpeggioToolPage() {
         <CardDescription>یک آکورد بدهید تا الگوی آرپژ مناسب سبک انتخابی ساخته شود.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <Label>آکورد پایه</Label>
             <Input
@@ -67,6 +67,18 @@ export default function ArpeggioToolPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>تعداد میزان</Label>
+            <Input
+              type="number"
+              min={2}
+              max={8}
+              value={input.bars}
+              onChange={(event) =>
+                setInput((prev) => ({ ...prev, bars: Number(event.target.value) || prev.bars }))
+              }
+            />
           </div>
         </div>
 

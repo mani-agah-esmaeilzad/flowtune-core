@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { generateChordSuggestion } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
@@ -15,7 +16,7 @@ const keyOptions = ["C", "G", "D", "A", "E", "B", "F", "Bb", "Eb", "Ab"];
 const styleOptions = ["Pop", "Rock", "Jazz", "R&B", "Lo-Fi", "Electronic"];
 
 export default function ChordsToolPage() {
-  const [input, setInput] = useState({ key: "C", style: "Pop" });
+  const [input, setInput] = useState({ key: "C", style: "Pop", bars: 4 });
   const [result, setResult] = useState<ChordSuggestionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -77,6 +78,18 @@ export default function ChordsToolPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>طول (تعداد میزان)</Label>
+            <Input
+              type="number"
+              min={2}
+              max={8}
+              value={input.bars}
+              onChange={(event) =>
+                setInput((prev) => ({ ...prev, bars: Number(event.target.value) || prev.bars }))
+              }
+            />
           </div>
         </div>
 

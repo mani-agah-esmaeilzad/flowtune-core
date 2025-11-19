@@ -56,17 +56,24 @@ const schemas: { [K in ToolType]: z.ZodType<ToolResponseMap[K]> } = {
 type PromptBuilder = (payload: Record<string, unknown>) => string;
 
 const promptBuilders: Record<ToolType, PromptBuilder> = {
-  chords: ({ key, style }) => `You are FlowTune, an assistant composer. Generate a chord progression for key ${key} in style ${style}.
+  chords: ({ key, style, bars = 4 }) => `You are FlowTune, an assistant composer. Write a harmonically interesting progression for ${bars} bars in key ${key} and style ${style}.
 Rules:
 - Return pure JSON matching {"progression":[],"timing":[],"tempo":number}
-- Use 4 to 8 chords, common pop/jazz names, allow inversions.
-- timing array must match progression length and use Tone.js durations such as 1m, 2n, 4n.
-- Tempo is bpm integer.
+- Use ${Number(bars) * 2} to ${Number(bars) * 3} chords including tasteful secondary dominants, borrowed chords, and inversions.
+- timing array must match progression length and add up to exactly ${bars} measures using Tone.js durations (1m, 2n, 4n, 8n).
+- Tempo is a bpm integer between 88-132 aligned to the style.
 `,
-  melody: ({ key, mood }) => `Compose a concise melody in key ${key} that feels ${mood}. Output JSON exactly like {"notes": [{"note":"E4","duration":"8n","time":0}],"tempo":number}. Each time may be number or Tone.js transport string. Keep within one octave range and durations 4n/8n/16n.`,
-  drums: ({ style }) => `Design a drum groove for style ${style}. Respond with {"kick":[],"snare":[],"hihat":[],"tempo":number}. Use Tone.js transport times (e.g. "0:0", "0:1", "0:2.5") covering at least one bar (0:0 to 0:3).`,
-  arpeggio: ({ chord, speed }) => `Generate an arpeggio for chord ${chord} with feel ${speed}. Respond as JSON {"notes": [...],"tempo":number}. Each note requires note/duration/time. Use flowing sixteenth or eighth movement inside two octaves.`,
-  "bass-guitar": ({ key, tempo, style }) => `Build a bass line and complementary guitar rhythm for key ${key} in style ${style} at tempo ${tempo} bpm. Return JSON {"bass":[{note,duration,time}],"guitar":[{note,duration,time}],"tempo":${tempo}}. Keep bass below C4 and guitar between C4-C6. Use Tone.js times for scheduling.`,
+  melody: ({ key, mood, bars = 4 }) => `Compose a memorable ${bars}-bar melody in key ${key} that feels ${mood}. Output JSON exactly like {"notes": [{"note":"E4","duration":"8n","time":0}],"tempo":number}. Each time may be number or Tone.js transport string.
+Guidance:
+- Keep phrases within 2 octaves, allow pickups and held notes.
+- Include repetition and variation across the bars, with durations of 4n/8n/16n and occasional 2n for sustain.
+- Provide at least ${Number(bars) * 4} notes and embed gentle velocity values (0.65-0.95).`,
+  drums: ({ style, bars = 2 }) => `Design a ${bars}-bar drum groove for style ${style}. Respond with {"kick":[],"snare":[],"hihat":[],"tempo":number}. Use Tone.js transport times (e.g. "0:0", "0:1", "1:2.5") covering ${bars} bars (from 0:0 up to ${bars - 1}:3). Layer ghost hits and syncopation by adding sixteenth offsets like 0:2.5.`,
+  arpeggio: ({ chord, speed, bars = 2 }) => `Generate an evolving ${bars}-bar arpeggio for chord ${chord} with feel ${speed}. Respond as JSON {"notes": [...],"tempo":number}. Each note requires note/duration/time. Keep motion flowing in eighths or sixteenths, include passing tones, and span up to two octaves with occasional velocity nuances.`,
+  "bass-guitar": ({ key, tempo, style, bars = 2 }) => `Build a ${bars}-bar bass line and complementary guitar rhythm for key ${key} in style ${style} at tempo ${tempo} bpm. Return JSON {"bass":[{note,duration,time,velocity?}],"guitar":[{note,duration,time,velocity?}],"tempo":${tempo}}.
+Guidance:
+- Bass stays below C4 with syncopated drives; guitar lives C4-C6 with off-beat chops or arpeggiated swells.
+- Use Tone.js times and ensure the timeline spans ${bars} bars with plenty of events (at least ${Number(bars) * 6} per lane). Include velocity dynamics between 0.6-0.95.`,
 };
 
 export async function generateFromGemini<T extends ToolType>(

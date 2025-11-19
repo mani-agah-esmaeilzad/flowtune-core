@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { generateDrumPattern } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
@@ -14,7 +15,7 @@ import type { DrumPatternResponse } from "@/lib/types/music";
 const styles = ["House", "Hip-Hop", "Trap", "Funk", "Afrobeat", "DnB"];
 
 export default function DrumsToolPage() {
-  const [style, setStyle] = useState("House");
+  const [input, setInput] = useState({ style: "House", bars: 2 });
   const [result, setResult] = useState<DrumPatternResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -23,7 +24,7 @@ export default function DrumsToolPage() {
     setError(null);
     startTransition(async () => {
       try {
-        const data = await generateDrumPattern({ style });
+        const data = await generateDrumPattern(input);
         setResult(data);
       } catch (err) {
         setError((err as Error).message);
@@ -40,20 +41,37 @@ export default function DrumsToolPage() {
         <CardDescription>ریتم ضربی چهارلاینی با کیک، اسنیر و های‌هت.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-2 max-w-sm">
-          <Label>سبک</Label>
-          <Select value={style} onValueChange={setStyle}>
-            <SelectTrigger>
-              <SelectValue placeholder="Style" />
-            </SelectTrigger>
-            <SelectContent>
-              {styles.map((item) => (
-                <SelectItem key={item} value={item}>
-                  {item}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid gap-4 md:grid-cols-2 max-w-2xl">
+          <div className="space-y-2">
+            <Label>سبک</Label>
+            <Select
+              value={input.style}
+              onValueChange={(value) => setInput((prev) => ({ ...prev, style: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Style" />
+              </SelectTrigger>
+              <SelectContent>
+                {styles.map((item) => (
+                  <SelectItem key={item} value={item}>
+                    {item}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>تعداد میزان</Label>
+            <Input
+              type="number"
+              min={2}
+              max={8}
+              value={input.bars}
+              onChange={(event) =>
+                setInput((prev) => ({ ...prev, bars: Number(event.target.value) || prev.bars }))
+              }
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-3">

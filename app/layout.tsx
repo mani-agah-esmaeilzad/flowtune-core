@@ -57,6 +57,9 @@ export default function RootLayout({
                 <Link className="hover:text-primary transition-colors" href="/tools/bass-guitar">
                   بیس / گیتار
                 </Link>
+                <Link className="hover:text-primary transition-colors" href="/admin">
+                  ادمین
+                </Link>
                 <Link
                   className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-primary transition hover:bg-primary/20 hover:text-primary"
                   href="/subscribe"

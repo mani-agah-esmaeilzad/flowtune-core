@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { generateMelody } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
@@ -15,7 +16,7 @@ const keyOptions = ["C", "G", "D", "A", "E", "F", "Bb", "Eb", "Ab"];
 const moods = ["Happy", "Dreamy", "Dark", "Epic", "Hopeful", "Chill"];
 
 export default function MelodyToolPage() {
-  const [input, setInput] = useState({ key: "C", mood: "Dreamy" });
+  const [input, setInput] = useState({ key: "C", mood: "Dreamy", bars: 4 });
   const [result, setResult] = useState<MelodyResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -41,7 +42,7 @@ export default function MelodyToolPage() {
         <CardDescription>گام و حس را مشخص کنید تا یک ملودی تراز Tone.js بگیرید.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
             <Label>گام</Label>
             <Select value={input.key} onValueChange={(value) => setInput((prev) => ({ ...prev, key: value }))}>
@@ -71,6 +72,18 @@ export default function MelodyToolPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>تعداد میزان</Label>
+            <Input
+              type="number"
+              min={2}
+              max={8}
+              value={input.bars}
+              onChange={(event) =>
+                setInput((prev) => ({ ...prev, bars: Number(event.target.value) || prev.bars }))
+              }
+            />
           </div>
         </div>
 

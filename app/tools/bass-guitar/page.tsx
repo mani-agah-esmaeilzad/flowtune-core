@@ -16,7 +16,7 @@ const keyOptions = ["C", "G", "D", "A", "E", "F", "Bb", "Eb"];
 const styles = ["Funk", "Disco", "Indie", "Pop", "Reggae", "Synthwave"];
 
 export default function BassGuitarToolPage() {
-  const [input, setInput] = useState({ key: "C", tempo: 110, style: "Indie" });
+  const [input, setInput] = useState({ key: "C", tempo: 110, style: "Indie", bars: 2 });
   const [result, setResult] = useState<BassGuitarResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -29,6 +29,7 @@ export default function BassGuitarToolPage() {
           key: input.key,
           tempo: input.tempo,
           style: input.style,
+          bars: input.bars,
         });
         setResult(data);
       } catch (err) {
@@ -46,7 +47,7 @@ export default function BassGuitarToolPage() {
         <CardDescription>لاین بیس و ریتم گیتار هماهنگ با کلید و تمپو انتخابی.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <div className="space-y-2">
             <Label>Key</Label>
             <Select value={input.key} onValueChange={(value) => setInput((prev) => ({ ...prev, key: value }))}>
@@ -88,6 +89,18 @@ export default function BassGuitarToolPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Bars</Label>
+            <Input
+              type="number"
+              min={2}
+              max={8}
+              value={input.bars}
+              onChange={(event) =>
+                setInput((prev) => ({ ...prev, bars: Number(event.target.value) || prev.bars }))
+              }
+            />
           </div>
         </div>
 

@@ -31,10 +31,10 @@ export async function addSubscriber(input: SubscriptionInput): Promise<Subscript
   const existingIndex = subscribers.findIndex((item) => item.email === input.email && item.plan === input.plan);
 
   if (existingIndex >= 0) {
-    subscribers[existingIndex] = record;
-  } else {
-    subscribers.push(record);
+    subscribers.splice(existingIndex, 1);
   }
+
+  subscribers.unshift(record);
 
   await fs.writeFile(dataPath, JSON.stringify(subscribers, null, 2), "utf8");
   return record;
