@@ -51,6 +51,9 @@ export default function RootLayout({
                 <Link className="hover:text-primary transition-colors" href="/tools/drums">
                   درام
                 </Link>
+                <Link className="hover:text-primary transition-colors" href="/tools/workbench">
+                  پنل یکپارچه
+                </Link>
                 <Link className="hover:text-primary transition-colors" href="/tools/layers">
                   لایه‌ها
                 </Link>

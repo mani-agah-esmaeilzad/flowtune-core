@@ -4,6 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 const tools = [
   {
+    title: "Unified FlowTune Panel",
+    description: "همه ابزارها در یک صفحه؛ لاین‌ها را بسازید، به هم وصل کنید و همزمان پلی کنید.",
+    href: "/tools/workbench",
+  },
+  {
     title: "AI Chord Suggestion",
     description: "پیشرفت‌های هارمونیک در گام دلخواه برای استارت ایده.",
     href: "/tools/chords",
