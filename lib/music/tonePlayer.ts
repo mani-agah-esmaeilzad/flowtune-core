@@ -78,6 +78,25 @@ function scheduleMelody(result: MelodyResponse | ArpeggioResponse, oscillator: s
   });
 }
 
+function schedulePercussion(times: string[], callback: (scheduleTime: number) => void) {
+  const sortedTimes = times
+    .map((time) => Tone.Time(time).toSeconds())
+    .filter((seconds) => Number.isFinite(seconds))
+    .sort((a, b) => a - b);
+
+  let previous = -Infinity;
+  const epsilon = 1e-4;
+
+  sortedTimes.forEach((startTime) => {
+    const scheduledTime = startTime <= previous ? previous + epsilon : startTime;
+    previous = scheduledTime;
+
+    Tone.Transport.schedule((time) => {
+      callback(time);
+    }, scheduledTime);
+  });
+}
+
 function scheduleDrums(result: DrumPatternResponse) {
   const kick = new Tone.MembraneSynth({ volume: -4 }).toDestination();
   const snare = new Tone.NoiseSynth({
@@ -87,20 +106,16 @@ function scheduleDrums(result: DrumPatternResponse) {
   }).toDestination();
   const hihat = new Tone.MetalSynth({ volume: -10, resonance: 4000 }).toDestination();
 
-  result.kick.forEach((time) => {
-    Tone.Transport.schedule((scheduleTime) => {
-      kick.triggerAttackRelease("C2", "8n", scheduleTime);
-    }, Tone.Time(time).toSeconds());
+  schedulePercussion(result.kick, (time) => {
+    kick.triggerAttackRelease("C2", "8n", time);
   });
-  result.snare.forEach((time) => {
-    Tone.Transport.schedule((scheduleTime) => {
-      snare.triggerAttackRelease("16n", scheduleTime);
-    }, Tone.Time(time).toSeconds());
+
+  schedulePercussion(result.snare, (time) => {
+    snare.triggerAttackRelease("16n", time);
   });
-  result.hihat.forEach((time) => {
-    Tone.Transport.schedule((scheduleTime) => {
-      hihat.triggerAttackRelease("32n", scheduleTime);
-    }, Tone.Time(time).toSeconds());
+
+  schedulePercussion(result.hihat, (time) => {
+    hihat.triggerAttackRelease("32n", time);
   });
 }
 
