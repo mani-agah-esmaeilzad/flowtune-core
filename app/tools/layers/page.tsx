@@ -193,7 +193,7 @@ export default function LayeredGroovePage() {
               onChange={(event) => setDrumInput(event.target.value)}
               className="font-mono text-xs"
               rows={10}
-              placeholder="{ \"kick\": [...], \"snare\": [...], \"hihat\": [...] }"
+              placeholder={'{ "kick": [...], "snare": [...], "hihat": [...] }'}
             />
             <div className="flex flex-wrap gap-3">
               <Button onClick={handleLoadDrums}>بارگذاری JSON درام</Button>
