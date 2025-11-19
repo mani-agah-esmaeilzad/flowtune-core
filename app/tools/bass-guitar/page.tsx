@@ -11,6 +11,7 @@ import { generateBassGuitar } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
 import type { BassGuitarResponse } from "@/lib/types/music";
+import { savePattern } from "@/lib/music/layerStore";
 
 const keyOptions = ["C", "G", "D", "A", "E", "F", "Bb", "Eb"];
 const styles = ["Funk", "Disco", "Indie", "Pop", "Reggae", "Synthwave"];
@@ -32,6 +33,7 @@ export default function BassGuitarToolPage() {
           bars: input.bars,
         });
         setResult(data);
+        savePattern("bass-guitar", data);
       } catch (err) {
         setError((err as Error).message);
       }

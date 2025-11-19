@@ -5,9 +5,12 @@ import { getChordNotes } from "./utils";
 import type {
   ArpeggioResponse,
   BassGuitarResponse,
+  GuitarFromDrumsResponse,
+  BassFromGrooveResponse,
   ChordSuggestionResponse,
   DrumPatternResponse,
   MelodyResponse,
+  LayerStackPayload,
   ToolType,
 } from "@/lib/types/music";
 
@@ -59,9 +62,36 @@ export async function playPattern(type: ToolType, data: unknown) {
     case "bass-guitar":
       scheduleBassGuitar(data as BassGuitarResponse);
       break;
+    case "guitar-from-drums":
+      scheduleGuitarOverlay(data as GuitarFromDrumsResponse);
+      break;
+    case "bass-from-groove":
+      scheduleBassOverlay(data as BassFromGrooveResponse);
+      break;
     default:
       break;
   }
+  Tone.Transport.start();
+}
+
+export async function playLayerStack(layers: LayerStackPayload) {
+  const tempo =
+    layers.tempo ||
+    layers.bassGuitar?.tempo ||
+    layers.guitarOverlay?.tempo ||
+    layers.drums?.tempo ||
+    layers.melody?.tempo ||
+    110;
+  await prepareTransport(tempo);
+
+  if (layers.chords) scheduleChords(layers.chords);
+  if (layers.melody) scheduleMelody(layers.melody, "triangle");
+  if (layers.arpeggio) scheduleMelody(layers.arpeggio, "sine");
+  if (layers.drums) scheduleDrums(layers.drums);
+  if (layers.bassGuitar) scheduleBassGuitar(layers.bassGuitar);
+  if (layers.guitarOverlay) scheduleGuitarOverlay(layers.guitarOverlay);
+  if (layers.bassOverlay) scheduleBassOverlay(layers.bassOverlay);
+
   Tone.Transport.start();
 }
 
@@ -139,6 +169,33 @@ function scheduleBassGuitar(result: BassGuitarResponse) {
       const duration = Tone.Time(note.duration || "16n").toSeconds();
       const velocity = humanizeVelocity(note.velocity ?? 0.8, 0.12);
       guitar.triggerAttackRelease(note.note, duration, scheduleTime, velocity);
+    }, humanizeTime(note.time, 0.018));
+  });
+}
+
+function scheduleGuitarOverlay(result: GuitarFromDrumsResponse) {
+  const reverb = new Tone.Reverb({ decay: 2.4, wet: 0.2 }).toDestination();
+  const chorus = new Tone.Chorus(4, 2.5, 0.3).start();
+  const guitar = new Tone.PluckSynth({ volume: -3 }).chain(chorus, reverb, Tone.Destination);
+
+  result.guitar.forEach((note) => {
+    Tone.Transport.schedule((scheduleTime) => {
+      const duration = Tone.Time(note.duration || "16n").toSeconds();
+      const velocity = humanizeVelocity(note.velocity ?? 0.82, 0.14);
+      guitar.triggerAttackRelease(note.note, duration, scheduleTime, velocity);
+    }, humanizeTime(note.time, 0.015));
+  });
+}
+
+function scheduleBassOverlay(result: BassFromGrooveResponse) {
+  const reverb = new Tone.Reverb({ decay: 2, wet: 0.16 }).toDestination();
+  const bass = new Tone.MonoSynth({ volume: -2, filter: { Q: 1.2, type: "lowpass", frequency: 600 } }).connect(reverb);
+
+  result.bass.forEach((note) => {
+    Tone.Transport.schedule((scheduleTime) => {
+      const duration = Tone.Time(note.duration || "8n").toSeconds();
+      const velocity = humanizeVelocity(note.velocity ?? 0.9, 0.12);
+      bass.triggerAttackRelease(note.note, duration, scheduleTime, velocity);
     }, humanizeTime(note.time, 0.018));
   });
 }

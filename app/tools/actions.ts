@@ -8,6 +8,8 @@ import type {
   DrumPatternResponse,
   ArpeggioResponse,
   BassGuitarResponse,
+  GuitarFromDrumsResponse,
+  BassFromGrooveResponse,
   ToolType,
 } from "@/lib/types/music";
 
@@ -70,4 +72,23 @@ export async function generateBassGuitar(input: {
   bars: number;
 }): Promise<BassGuitarResponse> {
   return recordRun("bass-guitar", input, () => generateFromGemini("bass-guitar", input));
+}
+
+export async function generateGuitarFromDrums(input: {
+  drums: DrumPatternResponse;
+  style: string;
+  groove: string;
+  bars: number;
+}): Promise<GuitarFromDrumsResponse> {
+  return recordRun("guitar-from-drums", input, () => generateFromGemini("guitar-from-drums", input));
+}
+
+export async function generateBassFromGroove(input: {
+  drums: DrumPatternResponse;
+  guitar: GuitarFromDrumsResponse["guitar"] | BassGuitarResponse["guitar"];
+  key: string;
+  tempo: number;
+  bars: number;
+}): Promise<BassFromGrooveResponse> {
+  return recordRun("bass-from-groove", input, () => generateFromGemini("bass-from-groove", input));
 }

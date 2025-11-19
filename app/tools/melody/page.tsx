@@ -11,6 +11,7 @@ import { generateMelody } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
 import type { MelodyResponse } from "@/lib/types/music";
+import { savePattern } from "@/lib/music/layerStore";
 
 const keyOptions = ["C", "G", "D", "A", "E", "F", "Bb", "Eb", "Ab"];
 const moods = ["Happy", "Dreamy", "Dark", "Epic", "Hopeful", "Chill"];
@@ -27,6 +28,7 @@ export default function MelodyToolPage() {
       try {
         const data = await generateMelody(input);
         setResult(data);
+        savePattern("melody", data);
       } catch (err) {
         setError((err as Error).message);
       }

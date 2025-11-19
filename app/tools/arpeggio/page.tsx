@@ -11,6 +11,7 @@ import { generateArpeggio } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
 import type { ArpeggioResponse } from "@/lib/types/music";
+import { savePattern } from "@/lib/music/layerStore";
 
 const feels = ["Gentle 8th", "Fast 16th", "Swing", "Triplet", "Broken Chords"];
 
@@ -26,6 +27,7 @@ export default function ArpeggioToolPage() {
       try {
         const data = await generateArpeggio(input);
         setResult(data);
+        savePattern("arpeggio", data);
       } catch (err) {
         setError((err as Error).message);
       }

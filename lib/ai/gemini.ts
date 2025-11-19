@@ -8,6 +8,8 @@ import type {
   DrumPatternResponse,
   ArpeggioResponse,
   BassGuitarResponse,
+  GuitarFromDrumsResponse,
+  BassFromGrooveResponse,
 } from "@/lib/types/music";
 
 const MODEL_NAME = "gemini-2.0-flash";
@@ -45,12 +47,25 @@ const bassGuitarSchema = z.object({
   tempo: z.number().optional(),
 }) satisfies z.ZodType<BassGuitarResponse>;
 
+const guitarOverlaySchema = z.object({
+  guitar: z.array(timedNoteSchema).min(4),
+  tabs: z.array(z.string()).min(3),
+  tempo: z.number().optional(),
+}) satisfies z.ZodType<GuitarFromDrumsResponse>;
+
+const bassOverlaySchema = z.object({
+  bass: z.array(timedNoteSchema).min(4),
+  tempo: z.number().optional(),
+}) satisfies z.ZodType<BassFromGrooveResponse>;
+
 const schemas: { [K in ToolType]: z.ZodType<ToolResponseMap[K]> } = {
   chords: chordSchema,
   melody: melodySchema,
   drums: drumSchema,
   arpeggio: arpeggioSchema,
   "bass-guitar": bassGuitarSchema,
+  "guitar-from-drums": guitarOverlaySchema,
+  "bass-from-groove": bassOverlaySchema,
 };
 
 type PromptBuilder = (payload: Record<string, unknown>) => string;
@@ -74,6 +89,22 @@ Guidance:
 Guidance:
 - Bass stays below C4 with syncopated drives; guitar lives C4-C6 with off-beat chops or arpeggiated swells.
 - Use Tone.js times and ensure the timeline spans ${bars} bars with plenty of events (at least ${Number(bars) * 6} per lane). Include velocity dynamics between 0.6-0.95.`,
+  "guitar-from-drums": ({ drums, style = "cinematic", groove = "syncopated", bars = 2 }) => `You receive a drum JSON groove (kick/snare/hihat arrays with Tone.js transport times) and must design a matching guitar part AND ASCII tablature.
+Incoming drum JSON: ${JSON.stringify(drums)}
+Return JSON strictly as {"guitar":[{note,duration,time,velocity?}],"tabs":["..."] ,"tempo":number}.
+Context:
+- Groove style: ${style}, feel: ${groove}, length: ${bars} bars.
+- Follow the drum pocket: emphasize snare backbeats, weave around kicks.
+- Guitar lives between C3-C6 using palm-muted chugs plus occasional double-stops.
+- tabs should be 6 strings low-to-high with measure markers like |---0---| and fret numbers aligned to Tone.js subdivision (sixteenth spacing).
+- Provide at least ${Number(bars) * 6} notes; use 8n/16n durations and offbeat times like 0:2.5.`,
+  "bass-from-groove": ({ drums, guitar, key = "C", tempo = 110, bars = 2 }) => `Craft a bass line that locks with the provided drum + guitar JSON. Respond ONLY with {"bass":[{note,duration,time,velocity?}],"tempo":${tempo}}.
+Incoming drums: ${JSON.stringify(drums)}
+Incoming guitar: ${JSON.stringify(guitar)}
+Expectations:
+- Keep notes C1-B3 in key ${key}; lean on roots, fifths, and chromatic approach notes into kicks.
+- Mirror strong beats with the kick times in drums.kick and answer guitar syncopation.
+- Use Tone.js transport times spanning ${bars} bars with at least ${Number(bars) * 5} notes. Include velocity 0.65-0.95 for dynamics.`,
 };
 
 export async function generateFromGemini<T extends ToolType>(

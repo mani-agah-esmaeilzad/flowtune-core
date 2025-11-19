@@ -40,6 +40,12 @@ export function downloadMidiFile<T extends ToolType>(
       buildNoteTrack(midi.addTrack(), data.guitar, tempo, 0);
       break;
     }
+    case "guitar-from-drums":
+      buildNoteTrack(midi.addTrack(), (payload as ToolResponseMap["guitar-from-drums"]).guitar, tempo);
+      break;
+    case "bass-from-groove":
+      buildNoteTrack(midi.addTrack(), (payload as ToolResponseMap["bass-from-groove"]).bass, tempo, -12);
+      break;
     default:
       break;
   }

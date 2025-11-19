@@ -19,6 +19,11 @@ const tools = [
     href: "/tools/drums",
   },
   {
+    title: "Layered Groove Studio",
+    description: "لاین‌های ذخیره‌شده را روی هم بندازید و درام را به گیتار و بیس زنده وصل کنید.",
+    href: "/tools/layers",
+  },
+  {
     title: "AI Arpeggio Maker",
     description: "حرکت‌های آرپژ از آکورد دلخواه و سرعت مشخص.",
     href: "/tools/arpeggio",
@@ -34,6 +39,10 @@ const highlights = [
   {
     title: "Gemini Flash 2.0",
     description: "پرامپت‌های دقیق موسیقایی و JSON معتبر برای هر ابزار.",
+  },
+  {
+    title: "Cross-Layer Chaining",
+    description: "نتیجه هر ابزار را به ابزار بعدی بدهید و استک‌های طولانی روی هم پلی کنید.",
   },
   {
     title: "Tone.js Playback",
@@ -59,8 +68,8 @@ export default function HomePage() {
               ۵ ابزار هوش مصنوعی برای خلق ایده‌های موسیقیایی آینده
             </h1>
             <p className="text-lg text-muted-foreground">
-              آکورد، ملودی، درام، آرپژ و ریتم گیتار را در چند ثانیه بسازید. همه‌چیز JSON استاندارد است، مستقیم با
-              Tone.js پخش می‌شود و آماده خروجی MIDI برای DAW.
+              آکورد، ملودی، درام، آرپژ و ریتم گیتار را در چند ثانیه بسازید و خروجی هرکدام را روی دیگری بیندازید. همه‌چیز
+              JSON استاندارد است، مستقیم با Tone.js پخش می‌شود و آماده خروجی MIDI برای DAW.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link

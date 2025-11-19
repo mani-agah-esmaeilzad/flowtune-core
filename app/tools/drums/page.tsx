@@ -11,6 +11,7 @@ import { generateDrumPattern } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
 import type { DrumPatternResponse } from "@/lib/types/music";
+import { savePattern } from "@/lib/music/layerStore";
 
 const styles = ["House", "Hip-Hop", "Trap", "Funk", "Afrobeat", "DnB"];
 
@@ -26,6 +27,7 @@ export default function DrumsToolPage() {
       try {
         const data = await generateDrumPattern(input);
         setResult(data);
+        savePattern("drums", data);
       } catch (err) {
         setError((err as Error).message);
       }

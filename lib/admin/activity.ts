@@ -76,6 +76,8 @@ export async function getActivityMetrics(): Promise<{
     drums: 0,
     arpeggio: 0,
     "bass-guitar": 0,
+    "guitar-from-drums": 0,
+    "bass-from-groove": 0,
   };
   activities.forEach((activity) => {
     byTool[activity.type] = (byTool[activity.type] ?? 0) + 1;

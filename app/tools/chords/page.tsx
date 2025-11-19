@@ -11,6 +11,7 @@ import { generateChordSuggestion } from "../actions";
 import { playPattern } from "@/lib/music/tonePlayer";
 import { downloadJsonFile, downloadMidiFile } from "@/lib/music/exporters";
 import type { ChordSuggestionResponse } from "@/lib/types/music";
+import { savePattern } from "@/lib/music/layerStore";
 
 const keyOptions = ["C", "G", "D", "A", "E", "B", "F", "Bb", "Eb", "Ab"];
 const styleOptions = ["Pop", "Rock", "Jazz", "R&B", "Lo-Fi", "Electronic"];
@@ -27,6 +28,7 @@ export default function ChordsToolPage() {
       try {
         const data = await generateChordSuggestion(input);
         setResult(data);
+        savePattern("chords", data);
       } catch (err) {
         setError((err as Error).message);
       }
